@@ -17,6 +17,7 @@ export default function CreateEvent() {
   const [discountCodes, setDiscountCodes] = useState([
     { code: "", discountPercentage: "", expiryDate: "" },
   ]);
+  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -61,6 +62,10 @@ export default function CreateEvent() {
     setDiscountCodes(newDiscountCodes);
   };
 
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -99,30 +104,27 @@ export default function CreateEvent() {
       return;
     }
 
-    const eventData = {
-      title,
-      description,
-      date,
-      time,
-      venue,
-      ticketTypes,
-      discountCodes,
-      organizer: user._id,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("date", date);
+    formData.append("time", time);
+    formData.append("venue", venue);
+    formData.append("image", image);
+    formData.append("ticketTypes", JSON.stringify(ticketTypes));
+    formData.append("discountCodes", JSON.stringify(discountCodes));
+    formData.append("organizer", user._id);
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(
-        `${API_ROUTE}/user/events/`,
-        eventData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_ROUTE}/user/events/`, formData, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       console.log("Event created successfully:", response.data);
       toast.success("Event created successfully");
     } catch (error) {
@@ -152,7 +154,7 @@ export default function CreateEvent() {
         {error && <p className="text-danger">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="title">Event Title</label>
+            <label htmlFor="title">Title:</label>
             <input
               type="text"
               id="title"
@@ -163,7 +165,7 @@ export default function CreateEvent() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="description">Event Description</label>
+            <label htmlFor="description">Description:</label>
             <textarea
               id="description"
               className="form-control"
@@ -173,19 +175,19 @@ export default function CreateEvent() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="date">Event Date</label>
+            <label htmlFor="date">Date:</label>
             <input
               type="date"
               id="date"
               className="form-control"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
               min={getCurrentDate()}
+              onChange={(e) => setDate(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="time">Event Time</label>
+            <label htmlFor="time">Time:</label>
             <input
               type="time"
               id="time"
@@ -196,7 +198,7 @@ export default function CreateEvent() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="venue">Event Venue</label>
+            <label htmlFor="venue">Venue:</label>
             <input
               type="text"
               id="venue"
@@ -206,162 +208,149 @@ export default function CreateEvent() {
               required
             />
           </div>
-
-          <div class="input-group my-3">
-            <input type="file" class="form-control" id="inputGroupFile02" />
-            <label class="input-group-text" for="inputGroupFile02">
-              Upload Event Image
-            </label>
+          <div className="form-group">
+            <label htmlFor="image">Event Image:</label>
+            <input
+              type="file"
+              id="image"
+              className="form-control"
+              onChange={handleImageChange}
+            />
           </div>
-
-          <div className="mt-4">
-            <h2 style={{ color: "red" }}>Ticket Types</h2>
-            {ticketTypes.map((ticket, index) => (
-              <div key={index} className="form-group border p-3 mb-2">
-                <div className="form-group">
-                  <label htmlFor={`type-${index}`}>Type</label>
-                  <input
-                    type="text"
-                    id={`type-${index}`}
-                    className="form-control "
-                    value={ticket.type}
-                    onChange={(e) =>
-                      handleTicketChange(index, "type", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor={`price-${index}`}>Price</label>
-                  <input
-                    type="number"
-                    id={`price-${index}`}
-                    className="form-control"
-                    value={ticket.price}
-                    onChange={(e) =>
-                      handleTicketChange(index, "price", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor={`quantity-${index}`}>Quantity</label>
-                  <input
-                    type="number"
-                    id={`quantity-${index}`}
-                    className="form-control"
-                    value={ticket.quantity}
-                    onChange={(e) =>
-                      handleTicketChange(index, "quantity", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor={`remaining-${index}`}>
-                    Remaining Tickets
-                  </label>
-                  <input
-                    type="number"
-                    id={`remaining-${index}`}
-                    className="form-control"
-                    value={ticket.remaining}
-                    onChange={(e) =>
-                      handleTicketChange(index, "remaining", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => handleTicketRemove(index)}
-                    className="btn btn-danger my-3"
-                  >
-                    Remove
-                  </button>
-                )}
+          <h2 className="text-center my-4" style={{ color: "red" }}>
+            Ticket Types
+          </h2>
+          {ticketTypes.map((ticket, index) => (
+            <div key={index} className="ticket-type">
+              <div className="form-group">
+                <label htmlFor={`ticketType-${index}`}>Type:</label>
+                <input
+                  type="text"
+                  id={`ticketType-${index}`}
+                  className="form-control"
+                  value={ticket.type}
+                  onChange={(e) =>
+                    handleTicketChange(index, "type", e.target.value)
+                  }
+                  required
+                />
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={addTicketType}
-              className="btn btn-primary my-3 "
-            >
-              Add Ticket Type
-            </button>
-          </div>
-          <div className="mt-4">
-            <h2 style={{ color: "red" }}>Discount Codes</h2>
-            {discountCodes.map((discount, index) => (
-              <div key={index} className="form-group border p-3 mb-2">
-                <div className="form-group">
-                  <label htmlFor={`code-${index}`}>Code</label>
-                  <input
-                    type="text"
-                    id={`code-${index}`}
-                    className="form-control"
-                    value={discount.code}
-                    onChange={(e) =>
-                      handleDiscountChange(index, "code", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor={`discountPercentage-${index}`}>
-                    Discount Percentage
-                  </label>
-                  <input
-                    type="number"
-                    id={`discountPercentage-${index}`}
-                    className="form-control"
-                    value={discount.discountPercentage}
-                    onChange={(e) =>
-                      handleDiscountChange(
-                        index,
-                        "discountPercentage",
-                        e.target.value
-                      )
-                    }
-                    required
-                    min={0}
-                    max={100}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor={`expiryDate-${index}`}>Expiry Date</label>
-                  <input
-                    type="date"
-                    id={`expiryDate-${index}`}
-                    className="form-control"
-                    value={discount.expiryDate}
-                    onChange={(e) =>
-                      handleDiscountChange(index, "expiryDate", e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => handleDiscountRemove(index)}
-                    className="btn btn-danger my-3"
-                  >
-                    Remove
-                  </button>
-                )}
+              <div className="form-group">
+                <label htmlFor={`ticketPrice-${index}`}>Price:</label>
+                <input
+                  type="number"
+                  id={`ticketPrice-${index}`}
+                  className="form-control"
+                  value={ticket.price}
+                  onChange={(e) =>
+                    handleTicketChange(index, "price", e.target.value)
+                  }
+                  required
+                />
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={addDiscountCode}
-              className="btn btn-primary"
-            >
-              Add Discount Code
-            </button>
-          </div>
-          <button type="submit" className="btn btn-danger mt-4">
+              <div className="form-group">
+                <label htmlFor={`ticketQuantity-${index}`}>Quantity:</label>
+                <input
+                  type="number"
+                  id={`ticketQuantity-${index}`}
+                  className="form-control"
+                  value={ticket.quantity}
+                  onChange={(e) =>
+                    handleTicketChange(index, "quantity", e.target.value)
+                  }
+                  required
+                />
+              </div>
+              
+              {ticketTypes.length > 1 && (
+                <button
+                  type="button"
+                  className="btn btn-danger my-2"
+                  onClick={() => handleTicketRemove(index)}
+                >
+                  Remove Ticket Type
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            className="btn btn-primary my-2"
+            onClick={addTicketType}
+          >
+            Add Ticket Type
+          </button>
+          <h2 className="text-center" style={{ color: "red" }}>
+            Discount Codes
+          </h2>
+          {discountCodes.map((discount, index) => (
+            <div key={index} className="discount-code">
+              <div className="form-group">
+                <label htmlFor={`discountCode-${index}`}>Code:</label>
+                <input
+                  type="text"
+                  id={`discountCode-${index}`}
+                  className="form-control"
+                  value={discount.code}
+                  onChange={(e) =>
+                    handleDiscountChange(index, "code", e.target.value)
+                  }
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor={`discountPercentage-${index}`}>
+                  Discount Percentage:
+                </label>
+                <input
+                  type="number"
+                  id={`discountPercentage-${index}`}
+                  className="form-control"
+                  value={discount.discountPercentage}
+                  onChange={(e) =>
+                    handleDiscountChange(
+                      index,
+                      "discountPercentage",
+                      e.target.value
+                    )
+                  }
+                  required
+                  min="0"
+                  max="100"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor={`expiryDate-${index}`}>Expiry Date:</label>
+                <input
+                  type="date"
+                  id={`expiryDate-${index}`}
+                  className="form-control my-2"
+                  value={discount.expiryDate}
+                  onChange={(e) =>
+                    handleDiscountChange(index, "expiryDate", e.target.value)
+                  }
+                  required
+                  min={getCurrentDate()}
+                />
+              </div>
+              {discountCodes.length > 1 && (
+              <button
+                type="button"
+                className="btn btn-danger my-2 "
+                onClick={() => handleDiscountRemove(index)}
+              >
+                Remove Discount Code
+              </button>)}
+            </div>
+          ))}
+          <button
+            type="button"
+            className="btn btn-primary my-2"
+            onClick={addDiscountCode}
+          >
+            Add Discount Code
+          </button>
+          <button type="submit" className="btn btn-success mx-3 my-2">
             Create Event
           </button>
         </form>

@@ -10,10 +10,10 @@ const ExploreEvents = () => {
   const data = JSON.parse(localStorage.getItem("user"));
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
-  const [discountCode, setDiscountCode] = useState("");
+  const [discountCodes, setDiscountCodes] = useState({});
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(6);
 
   useEffect(() => {
     axios
@@ -41,7 +41,13 @@ const ExploreEvents = () => {
     setLocation(e.target.value.toLowerCase());
   };
 
+  const handleDiscountCodeChange = (e, eventId) => {
+    setDiscountCodes({ ...discountCodes, [eventId]: e.target.value });
+  };
+
   const handleTicketSelection = async (ticketType, event) => {
+    const discountCode = discountCodes[event._id] || "";
+
     const ticketData = {
       eventId: event._id,
       attendee: data._id,
@@ -50,15 +56,25 @@ const ExploreEvents = () => {
     };
 
     try {
-      const response = await axios.post(`${API_ROUTE}/user/events/${event._id}/book`, ticketData, {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      });
+      const response = await axios.post(
+        `${API_ROUTE}/user/events/${event._id}/book`,
+        ticketData,
+        {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        }
+      );
 
-      toast.success(`Ticket booked successfully. Final price: $${response.data.finalPrice}`);
+      toast.success(
+        `Ticket booked successfully. Final price: $${response.data.finalPrice}`
+      );
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message === "You are already attending this event") {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message === "You are already attending this event"
+      ) {
         toast.error("You have already booked a ticket for this event.");
       } else {
         toast.error(error.response.data.message);
@@ -72,7 +88,7 @@ const ExploreEvents = () => {
 
     const eventDateTime = new Date(event.date);
     const currentDate = new Date();
-   
+
     return (
       eventTitle.includes(search) &&
       (!location || eventVenue.includes(location)) &&
@@ -82,7 +98,10 @@ const ExploreEvents = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem+1);
+  const currentEvents = filteredEvents.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const renderPagination = () => {
@@ -90,16 +109,19 @@ const ExploreEvents = () => {
     const pages = [];
     for (let i = 1; i <= pageNumbers; i++) {
       pages.push(
-        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
-          <button className="page-link" onClick={() => paginate(i)}>{i}</button>
+        <li
+          key={i}
+          className={`page-item ${currentPage === i ? "active" : ""}`}
+        >
+          <button className="page-link" onClick={() => paginate(i)}>
+            {i}
+          </button>
         </li>
       );
     }
     return (
       <nav>
-        <ul className="pagination justify-content-center">
-          {pages}
-        </ul>
+        <ul className="pagination justify-content-center">{pages}</ul>
       </nav>
     );
   };
@@ -124,13 +146,6 @@ const ExploreEvents = () => {
               onChange={handleLocationFilter}
               className="form-control mb-2"
             />
-            <input
-              type="text"
-              placeholder="Enter discount code"
-              value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value)}
-              className="form-control mb-2"
-            />
           </div>
         </div>
         <div>
@@ -142,18 +157,21 @@ const ExploreEvents = () => {
                 {currentEvents.map((event) => (
                   <div key={event._id} className="col-md-6 col-lg-4 mb-4">
                     <div className="card h-100 border-danger">
-                      {/* {event.image && (
+                      {event.image && (
                         <img
-                        src={`${API_ROUTE}/images/${event.image}`} 
-                        className="card-img-top"
-                        alt="Event"
-                      />
+                          src={`${API_ROUTE}/api/uploads/${event.image}`}
+                          className="card-img-top"
+                          alt="Event"
+                          name="image"
+                        />
                       )}
-                      {`${API_ROUTE}/${event.image}`} */}
                       <div className="card-body">
-                        <h2 className="card-title text-danger">{event.title}</h2>
+                        <h2 className="card-title text-danger">
+                          {event.title}
+                        </h2>
                         <p className="card-text">
-                          {new Date(event.date).toLocaleDateString()} - {event.venue}
+                          {new Date(event.date).toLocaleDateString()} -{" "}
+                          {event.venue}
                         </p>
                         {event.description && (
                           <p className="card-text">
@@ -171,11 +189,22 @@ const ExploreEvents = () => {
                             <ul className="my-2">
                               {event.ticketTypes.map((ticketType) => (
                                 <li key={ticketType.type}>
-                                  {ticketType.type} - &#8377;{ticketType.price}{" "}
+                                  {ticketType.type} - ${ticketType.price}{" "}
                                   (Quantity: {ticketType.quantity})
+                                  <input
+                                    type="text"
+                                    placeholder="Enter discount code"
+                                    value={discountCodes[event._id] || ""}
+                                    onChange={(e) =>
+                                      handleDiscountCodeChange(e, event._id)
+                                    }
+                                    className="form-control my-2"
+                                  />
                                   <button
                                     className="btn btn-danger btn-sm mx-2 my-2"
-                                    onClick={() => handleTicketSelection(ticketType, event)}
+                                    onClick={() =>
+                                      handleTicketSelection(ticketType, event)
+                                    }
                                   >
                                     Book Me
                                   </button>

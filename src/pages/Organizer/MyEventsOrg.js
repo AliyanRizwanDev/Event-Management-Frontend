@@ -78,10 +78,9 @@ const MyEventsOrg = () => {
 
   const closeModal = () => {
     setModalIsOpen(false);
-    fetchData(); // Refetch events after modal closes to get updated data
+    fetchData(); 
   };
 
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentEvents = events.slice(indexOfFirstItem, indexOfLastItem);
@@ -100,24 +99,34 @@ const MyEventsOrg = () => {
           <ul className="list-group">
             {currentEvents.map((event) => (
               <li key={event._id} className="list-group-item border my-2">
-                <div>
-                  <h2 className="text-danger">{event.title}</h2>
-                  <p>{event.description}</p>
-                  <p>Date: {event.date.split("T")[0]}</p>
-                  <p>Time: {event.time}</p>
-                  <p>Venue: {event.venue}</p>
-                  <button
-                    onClick={() => cancelEvent(event._id)}
-                    className="btn btn-danger me-2"
-                  >
-                    Delete Event
-                  </button>
-                  <button
-                    onClick={() => editEvent(event._id)}
-                    className="btn btn-danger"
-                  >
-                    Edit Event
-                  </button>
+                <div className="d-flex align-items-start">
+                  <div className="flex-grow-1">
+                    <h2 className="text-danger">{event.title}</h2>
+                    <p>{event.description}</p>
+                    <p>Date: {event.date.split("T")[0]}</p>
+                    <p>Time: {event.time}</p>
+                    <p>Venue: {event.venue}</p>
+                    <button
+                      onClick={() => cancelEvent(event._id)}
+                      className="btn btn-danger me-2"
+                    >
+                      Delete Event
+                    </button>
+                    <button
+                      onClick={() => editEvent(event._id)}
+                      className="btn btn-danger"
+                    >
+                      Edit Event
+                    </button>
+                  </div>
+                  {event.image && (
+                    <img
+                      src={`${API_ROUTE}/api/uploads/${event.image}`}
+                      alt="Event"
+                      className="img-fluid mb-3 ms-3"
+                      style={{ maxHeight: "200px", objectFit: "cover" }}
+                    />
+                  )}
                 </div>
               </li>
             ))}
@@ -144,7 +153,7 @@ const MyEventsOrg = () => {
         contentLabel="Edit Event Modal"
       >
         <EditEventModal eventId={eventId} />
-        <button onClick={closeModal} className="btn btn-danger mt-3">
+        <button onClick={closeModal} style={{ zIndex: "1000" }} className="btn btn-danger mt-3">
           Close
         </button>
       </Modal>

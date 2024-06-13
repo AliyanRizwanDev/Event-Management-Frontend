@@ -47,6 +47,21 @@ const getAttendeeDetails = async (attendeeId) => {
   }
 };
 
+// Helper function to check if an event is closed
+const isEventClosed = (eventDate) => {
+  const currentDate = new Date();
+  const eventDateObj = new Date(eventDate);
+  return eventDateObj < currentDate;
+};
+
+// Helper function to calculate average rating from feedback
+const calculateAverageRating = (feedback) => {
+  if (feedback.length === 0) return 0;
+  
+  const totalRatings = feedback.reduce((sum, { rating }) => sum + rating, 0);
+  return totalRatings / feedback.length;
+};
+
 // Frontend component
 export default function Analytics() {
   const [events, setEvents] = useState([]);
@@ -72,6 +87,10 @@ export default function Analytics() {
             ...prevMap,
             [event._id]: attendees,
           }));
+
+          // Calculate average rating for the event
+          const avgRating = calculateAverageRating(event.feedback);
+          event.avgRating = avgRating; // Ensure avgRating is assigned to event object
         }
       } catch (error) {
         setError("Error fetching event data");
@@ -127,6 +146,9 @@ export default function Analytics() {
             <div key={event._id} className="card mb-4 border-danger">
               <div className="card-header bg-danger text-white">
                 <h2>{event.title}</h2>
+                {isEventClosed(event.date) && (
+                  <span className="badge bg-dark ms-2">Event Closed</span>
+                )}
               </div>
               <div className="card-body">
                 <section className="mb-3">
@@ -140,8 +162,12 @@ export default function Analytics() {
                         <strong>Price:</strong> ${ticket.price}
                       </p>
                       <p>
-                        <strong>Sold:</strong> {ticket.quantity}
+                        <strong>Tickets Remaining:</strong> {ticket.quantity}
                       </p>
+                      <p>
+                        <strong>Sold:</strong> {ticket.remaining || 0}
+                      </p>
+                      <hr />
                     </div>
                   ))}
                 </section>
@@ -164,6 +190,27 @@ export default function Analytics() {
                       <li className="list-group-item">No attendees</li>
                     )}
                   </ul>
+                </section>
+
+                <section className="mb-3">
+                  <h3 className="text-danger">Feedback</h3>
+                  {event.avgRating !== undefined ? ( // Check if avgRating is defined
+                    <div>
+                      <p>
+                        <strong>Average Rating:</strong> {event.avgRating.toFixed(1)}
+                      </p>
+                      <ul>
+                        {event.feedback.map((feedbackItem) => (
+                          <li key={feedbackItem._id}>
+                            <p><strong>Rating:</strong> {feedbackItem.rating}</p>
+                            <p><strong>Comment:</strong> {feedbackItem.comment}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <p>No feedback available</p>
+                  )}
                 </section>
               </div>
             </div>
