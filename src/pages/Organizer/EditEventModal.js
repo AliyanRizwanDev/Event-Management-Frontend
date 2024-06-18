@@ -12,8 +12,12 @@ export default function EditEventModal({ eventId }) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [venue, setVenue] = useState("");
-  const [ticketTypes, setTicketTypes] = useState([{ type: "", price: "", quantity: "" }]);
-  const [discountCodes, setDiscountCodes] = useState([{ code: "", discountPercentage: "", expiryDate: "" }]);
+  const [ticketTypes, setTicketTypes] = useState([
+    { type: "", price: "", quantity: "" },
+  ]);
+  const [discountCodes, setDiscountCodes] = useState([
+    { code: "", discountPercentage: "", expiryDate: "" },
+  ]);
   const [loading, setLoading] = useState(false);
   const data = localStorage.getItem("user");
 
@@ -21,11 +25,14 @@ export default function EditEventModal({ eventId }) {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_ROUTE}/user/events/${eventId}`, {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(data).token}`,
-          },
-        });
+        const response = await axios.get(
+          `${API_ROUTE}/user/events/${eventId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(data).token}`,
+            },
+          }
+        );
         const eventData = response.data;
         setEvent(eventData);
         setTitle(eventData.title);
@@ -49,8 +56,8 @@ export default function EditEventModal({ eventId }) {
   const getCurrentDate = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
   };
 
@@ -77,7 +84,10 @@ export default function EditEventModal({ eventId }) {
   };
 
   const addDiscountCode = () => {
-    setDiscountCodes([...discountCodes, { code: "", discountPercentage: "", expiryDate: "" }]);
+    setDiscountCodes([
+      ...discountCodes,
+      { code: "", discountPercentage: "", expiryDate: "" },
+    ]);
   };
 
   const handleDiscountRemove = (index) => {
@@ -95,31 +105,46 @@ export default function EditEventModal({ eventId }) {
       !date ||
       !time ||
       !venue ||
-      !ticketTypes.every(ticket => ticket.type && ticket.price && ticket.quantity) ||
-      !discountCodes.every(discount => discount.code && discount.discountPercentage && discount.expiryDate)
+      !ticketTypes.every(
+        (ticket) => ticket.type && ticket.price && ticket.quantity
+      ) ||
+      !discountCodes.every(
+        (discount) =>
+          discount.code && discount.discountPercentage && discount.expiryDate
+      )
     ) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
-    const eventData = {
-      title,
-      description,
-      date,
-      time,
-      venue,
-      ticketTypes,
-      discountCodes,
-      organizer: JSON.parse(data)._id,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("date", date);
+    formData.append("time", time);
+    formData.append("venue", venue);
+    formData.append("ticketTypes", JSON.stringify(ticketTypes));
+    formData.append("discountCodes", JSON.stringify(discountCodes));
+    formData.append("organizer", JSON.parse(data)._id);
+    if (document.getElementById("inputGroupFile02").files[0]) {
+      formData.append(
+        "image",
+        document.getElementById("inputGroupFile02").files[0]
+      );
+    }
 
     try {
       setLoading(true);
-      const response = await axios.put(`${API_ROUTE}/user/events/${eventId}`, eventData, {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(data).token}`,
-        },
-      });
+      const response = await axios.put(
+        `${API_ROUTE}/user/events/${eventId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(data).token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       console.log("Event updated successfully:", response.data);
       toast.success("Event updated successfully");
     } catch (error) {
@@ -136,33 +161,72 @@ export default function EditEventModal({ eventId }) {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center" style={{ color: "red" }}>Edit Event</h1>
+      <h1 className="text-center" style={{ color: "red" }}>
+        Edit Event
+      </h1>
       {loading && <Spinner />}
       {error && <p className="text-danger">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="title">Event Title</label>
-          <input type="text" id="title" className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          <input
+            type="text"
+            id="title"
+            className="form-control"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
         </div>
         <div className="form-group">
           <label htmlFor="description">Event Description</label>
-          <textarea id="description" className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} required />
+          <textarea
+            id="description"
+            className="form-control"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
         </div>
         <div className="form-group">
           <label htmlFor="date">Event Date</label>
-          <input type="date" id="date" className="form-control" value={date} onChange={(e) => setDate(e.target.value)} min={getCurrentDate()} required />
+          <input
+            type="date"
+            id="date"
+            className="form-control"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            min={getCurrentDate()}
+            required
+          />
         </div>
         <div className="form-group">
           <label htmlFor="time">Event Time</label>
-          <input type="time" id="time" className="form-control" value={time} onChange={(e) => setTime(e.target.value)} required />
+          <input
+            type="time"
+            id="time"
+            className="form-control"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            required
+          />
         </div>
         <div className="form-group">
           <label htmlFor="venue">Event Venue</label>
-          <input type="text" id="venue" className="form-control" value={venue} onChange={(e) => setVenue(e.target.value)} required />
+          <input
+            type="text"
+            id="venue"
+            className="form-control"
+            value={venue}
+            onChange={(e) => setVenue(e.target.value)}
+            required
+          />
         </div>
         <div className="input-group my-3">
           <input type="file" className="form-control" id="inputGroupFile02" />
-          <label className="input-group-text" htmlFor="inputGroupFile02">Upload Event Image</label>
+          <label className="input-group-text" htmlFor="inputGroupFile02">
+            Upload Event Image
+          </label>
         </div>
         <div className="mt-4">
           <h2 style={{ color: "red" }}>Ticket Types</h2>
@@ -170,23 +234,62 @@ export default function EditEventModal({ eventId }) {
             <div key={index} className="form-group border p-3 mb-2">
               <div className="form-group">
                 <label htmlFor={`type-${index}`}>Type</label>
-                <input type="text" id={`type-${index}`} className="form-control" value={ticket.type} onChange={(e) => handleTicketChange(index, "type", e.target.value)} required />
+                <input
+                  type="text"
+                  id={`type-${index}`}
+                  className="form-control"
+                  value={ticket.type}
+                  onChange={(e) =>
+                    handleTicketChange(index, "type", e.target.value)
+                  }
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor={`price-${index}`}>Price</label>
-                <input type="number" id={`price-${index}`} className="form-control" value={ticket.price} onChange={(e) => handleTicketChange(index, "price", e.target.value)} required />
+                <input
+                  type="number"
+                  id={`price-${index}`}
+                  className="form-control"
+                  value={ticket.price}
+                  onChange={(e) =>
+                    handleTicketChange(index, "price", e.target.value)
+                  }
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor={`quantity-${index}`}>Quantity</label>
-                <input type="number" id={`quantity-${index}`} className="form-control" value={ticket.quantity} onChange={(e) => handleTicketChange(index, "quantity", e.target.value)} required />
+                <input
+                  type="number"
+                  id={`quantity-${index}`}
+                  className="form-control"
+                  value={ticket.quantity}
+                  onChange={(e) =>
+                    handleTicketChange(index, "quantity", e.target.value)
+                  }
+                  required
+                />
               </div>
-             
+
               {index > 0 && (
-                <button type="button" onClick={() => handleTicketRemove(index)} className="btn btn-danger my-3">Remove</button>
+                <button
+                  type="button"
+                  onClick={() => handleTicketRemove(index)}
+                  className="btn btn-danger my-3"
+                >
+                  Remove
+                </button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addTicketType} className="btn btn-primary my-3">Add Ticket Type</button>
+          <button
+            type="button"
+            onClick={addTicketType}
+            className="btn btn-primary my-3"
+          >
+            Add Ticket Type
+          </button>
         </div>
         <div className="mt-4">
           <h2 style={{ color: "red" }}>Discount Codes</h2>
@@ -194,20 +297,74 @@ export default function EditEventModal({ eventId }) {
             <div key={index} className="form-group border p-3 mb-2">
               <div className="form-group">
                 <label htmlFor={`code-${index}`}>Code</label>
-                <input type="text" id={`code-${index}`} className="form-control" value={discount.code} onChange={(e) => handleDiscountChange(index, "code", e.target.value)} required />
+                <input
+                  type="text"
+                  id={`code-${index}`}
+                  className="form-control"
+                  value={discount.code}
+                  onChange={(e) =>
+                    handleDiscountChange(index, "code", e.target.value)
+                  }
+                  required
+                />
               </div>
               <div className="form-group">
-                <label htmlFor={`discountPercentage-${index}`}>Discount Percentage</label>
-                <input type="number" id={`discountPercentage-${index}`} className="form-control" value={discount.discountPercentage} onChange={(e) => handleDiscountChange(index, "discountPercentage", e.target.value)} required min={0} max={100} />
+                <label htmlFor={`discountPercentage-${index}`}>
+                  Discount Percentage
+                </label>
+                <input
+                  type="number"
+                  id={`discountPercentage-${index}`}
+                  className="form-control"
+                  value={discount.discountPercentage}
+                  onChange={(e) =>
+                    handleDiscountChange(
+                      index,
+                      "discountPercentage",
+                      e.target.value
+                    )
+                  }
+                  required
+                  min={0}
+                  max={100}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor={`expiryDate-${index}`}>Discount Expiry Date</label>
+                <input
+                  type="date"
+                  id={`expiryDate-${index}`}
+                  className="form-control"
+                  value={discount.expiryDate.split("T")[0]}
+                  onChange={(e) =>
+                    handleDiscountChange(index, "expiryDate", e.target.value)
+                  }
+                  min={getCurrentDate()}
+                  required
+                />
               </div>
               {index > 0 && (
-                <button type="button" onClick={() => handleDiscountRemove(index)} className="btn btn-danger my-3">Remove</button>
+                <button
+                  type="button"
+                  onClick={() => handleDiscountRemove(index)}
+                  className="btn btn-danger my-3"
+                >
+                  Remove
+                </button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addDiscountCode} className="btn btn-primary">Add Discount Code</button>
+          <button
+            type="button"
+            onClick={addDiscountCode}
+            className="btn btn-primary"
+          >
+            Add Discount Code
+          </button>
         </div>
-        <button type="submit" className="btn btn-danger mt-4">Update Event</button>
+        <button type="submit" className="btn btn-danger mt-4">
+          Update Event
+        </button>
       </form>
     </div>
   );

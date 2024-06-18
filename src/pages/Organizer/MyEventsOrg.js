@@ -37,13 +37,24 @@ const MyEventsOrg = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = localStorage.getItem("user");
+      const userData = JSON.parse(localStorage.getItem("user"));
+
+      if (!userData || !userData.token) {
+        throw new Error("User not authenticated");
+      }
+
       const response = await axios.get(`${API_ROUTE}/user/events`, {
         headers: {
-          Authorization: `Bearer ${JSON.parse(data).token}`,
+          Authorization: `Bearer ${userData.token}`,
         },
       });
-      setEvents(response.data);
+
+      const userId = userData._id;
+      const userCreatedEvents = response.data.filter(
+        (event) => event.organizer === userId
+      );
+
+      setEvents(userCreatedEvents);
     } catch (error) {
       console.error("Error fetching events:", error);
       toast.error("Error fetching events");
@@ -78,7 +89,7 @@ const MyEventsOrg = () => {
 
   const closeModal = () => {
     setModalIsOpen(false);
-    fetchData(); 
+    fetchData();
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -135,13 +146,24 @@ const MyEventsOrg = () => {
         {events.length > itemsPerPage && (
           <nav>
             <ul className="pagination justify-content-center mt-3">
-              {Array.from({ length: Math.ceil(events.length / itemsPerPage) }, (_, i) => (
-                <li key={i + 1} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                  <button onClick={() => paginate(i + 1)} className="page-link">
-                    {i + 1}
-                  </button>
-                </li>
-              ))}
+              {Array.from(
+                { length: Math.ceil(events.length / itemsPerPage) },
+                (_, i) => (
+                  <li
+                    key={i + 1}
+                    className={`page-item ${
+                      currentPage === i + 1 ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      onClick={() => paginate(i + 1)}
+                      className="page-link"
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                )
+              )}
             </ul>
           </nav>
         )}
@@ -153,7 +175,11 @@ const MyEventsOrg = () => {
         contentLabel="Edit Event Modal"
       >
         <EditEventModal eventId={eventId} />
-        <button onClick={closeModal} style={{ zIndex: "1000" }} className="btn btn-danger mt-3">
+        <button
+          onClick={closeModal}
+          style={{ zIndex: "1000" }}
+          className="btn btn-danger mt-3"
+        >
           Close
         </button>
       </Modal>

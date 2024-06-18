@@ -12,12 +12,17 @@ const AllEventsDetails = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentEvents, setCurrentEvents] = useState([]);
-  const itemsPerPage = 5; // Number of events per page
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchEventData = async () => {
       try {
         const data = localStorage.getItem("user");
+        if (!data) {
+          setError("User not found. Please log in.");
+          setLoading(false);
+          return;
+        }
         const user = JSON.parse(data);
 
         const response = await axios.get(`${API_ROUTE}/user/events/`, {
@@ -25,32 +30,36 @@ const AllEventsDetails = () => {
             Authorization: `Bearer ${user.token}`,
           },
         });
+
         const eventsData = response.data;
-
         const attendeesMap = {};
-        for (const event of eventsData) {
-          const attendees = [];
-          for (const attendeeId of event.attendees) {
-            const attendeeResponse = await axios.get(
-              `${API_ROUTE}/user/profile/${attendeeId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${user.token}`,
-                },
-              }
-            );
-            attendees.push(attendeeResponse.data.userProfile);
-          }
-          attendeesMap[event._id] = attendees;
-        }
-        setAttendeesMap(attendeesMap);
 
-        // Set events data and calculate currentEvents
+        await Promise.all(
+          eventsData.map(async (event) => {
+            const attendees = await Promise.all(
+              event.attendees.map(async (attendeeId) => {
+                try {
+                  const attendeeResponse = await axios.get(
+                    `${API_ROUTE}/user/profile/${attendeeId}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${user.token}`,
+                      },
+                    }
+                  );
+                  return attendeeResponse.data.userProfile;
+                } catch (error) {
+                  console.warn(`Skipping deleted or invalid attendee ID: ${attendeeId}`);
+                  return null;
+                }
+              })
+            );
+            attendeesMap[event._id] = attendees.filter(Boolean);
+          })
+        );
+
+        setAttendeesMap(attendeesMap);
         setEvents(eventsData);
-        const indexOfLastItem = currentPage * itemsPerPage;
-        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-        const currentEvents = eventsData.slice(indexOfFirstItem, indexOfLastItem);
-        setCurrentEvents(currentEvents);
       } catch (error) {
         setError("Error fetching event data");
         toast.error("Error fetching event data");
@@ -61,9 +70,17 @@ const AllEventsDetails = () => {
     };
 
     fetchEventData();
-  }, [currentPage]);
+  }, []);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  useEffect(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    setCurrentEvents(events.slice(indexOfFirstItem, indexOfLastItem));
+  }, [currentPage, events]);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const renderPagination = () => {
     const pageNumbers = [];

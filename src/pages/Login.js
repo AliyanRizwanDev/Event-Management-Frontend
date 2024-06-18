@@ -23,21 +23,18 @@ export default function Login() {
     event.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email.toLowerCase());
-    const isPasswordValid =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/.test(
-        password
-      );
-
+    const isPasswordValid = password.length >= 6;
+  
     setEmailError(!isEmailValid);
     setPasswordError(!isPasswordValid);
-
+  
     if (isEmailValid && isPasswordValid) {
       setLoading(true);
       const data = {
         email,
         password,
       };
-
+  
       try {
         const response = await axios.post(`${API_ROUTE}/user/login`, data);
         localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -53,6 +50,7 @@ export default function Login() {
       }
     }
   };
+  
 
   return (
     <div className={classes.loginPage}>
@@ -82,9 +80,7 @@ export default function Login() {
           />
           {passwordError && (
             <p className={classes.errorMessage}>
-              Password must be at least 8 characters long and contain at least
-              one lowercase letter, one uppercase letter, one digit, and one
-              special character
+              Password must be at least 6 characters long
             </p>
           )}
           <button type="submit" disabled={loading}>

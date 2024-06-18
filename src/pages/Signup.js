@@ -23,20 +23,16 @@ export default function Signup() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email.toLowerCase());
-    const isPasswordValid =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/.test(
-        password
-      );
-    const isConfirmPasswordValid =
-      isPasswordValid && password === confirmPassword;
-
+    const isPasswordValid = password.length >= 6;
+    const isConfirmPasswordValid = password === confirmPassword;
+  
     setEmailError(!isEmailValid);
     setPasswordError(!isPasswordValid);
     setConfirmPasswordError(!isConfirmPasswordValid);
-
+  
     if (isEmailValid && isPasswordValid && isConfirmPasswordValid) {
       setLoading(true);
       const data = {
@@ -46,11 +42,10 @@ export default function Signup() {
         password,
         role,
       };
-
+  
       try {
         await axios.post(`${API_ROUTE}/user/signup`, data);
         setApiError("");
-
         toast.success("Account Created");
         nav(`/`);
       } catch (error) {
@@ -61,6 +56,7 @@ export default function Signup() {
       }
     }
   };
+  
 
   return (
     <div className={classes.loginPage}>
@@ -104,9 +100,7 @@ export default function Signup() {
           />
           {passwordError && (
             <p className={classes.errorMessage}>
-              Password must be at least 8 characters long and contain at least
-              one lowercase letter, one uppercase letter, one digit, and one
-              special character
+              Password must be at least 6 characters long
             </p>
           )}
           <label htmlFor="confirmpassword">Confirm Password</label>
