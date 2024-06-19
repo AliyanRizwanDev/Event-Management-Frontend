@@ -105,7 +105,7 @@ const MyProfile = () => {
   return (
     <Home>
       <div className="container mt-4">
-        <h1 className="text-center text-danger">My Profile</h1>
+        <h1 className="text-center text-secondary">My Profile</h1>
 
         {loading ? (
           <Spinner />
@@ -144,7 +144,7 @@ const MyProfile = () => {
                 />
               </div>
               {error && <p className="text-danger">{error}</p>}
-              <button className="btn btn-danger my-3" onClick={handleSave}>
+              <button className="btn btn-outline-danger my-3" onClick={handleSave}>
                 Save Changes
               </button>
             </div>
@@ -179,7 +179,7 @@ const MyProfile = () => {
                 />
               </div>
               {passwordError && <p className="text-danger">{passwordError}</p>}
-              <button className="btn btn-danger my-3" onClick={handlePassword}>
+              <button className="btn btn-outline-danger my-3" onClick={handlePassword}>
                 Change Password
               </button>
             </div>

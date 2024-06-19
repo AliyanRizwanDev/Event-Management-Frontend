@@ -51,7 +51,7 @@ const AttendeeDashboard = () => {
   return (
     <Home>
       <div className="container mt-4">
-        <h1 className="text-center">Dashboard</h1>
+        <h1 className="text-center text-secondary mb-5">Dashboard</h1>
 
         <div className="row">
           <div className="col-md-6">

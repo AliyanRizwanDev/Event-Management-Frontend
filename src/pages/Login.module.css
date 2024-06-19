@@ -8,8 +8,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 768px;
-  background-color: blue;
+  height: 100vh;
+    background-color: blue;
 }
 .leftDesign h4 {
   color: red;

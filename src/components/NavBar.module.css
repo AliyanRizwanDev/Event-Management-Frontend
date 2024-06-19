@@ -1,6 +1,6 @@
 .navBar {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   padding: 10px;
   padding-top: 15px;
   background: rgb(247, 247, 247);
@@ -8,8 +8,10 @@
 }
 .navBar img {
   width: 100%;
+
 }
 
 .LogoImg {
   width: 200px;
+  margin-left: 20px;
 }

@@ -129,7 +129,7 @@ const ExploreEvents = () => {
   return (
     <Home>
       <div className="container mt-4">
-        <h1 className="text-center text-danger">Explore Events</h1>
+        <h1 className="text-center text-secondary">Explore Events</h1>
         <div className="my-4">
           <div className="form-group">
             <input
@@ -166,7 +166,7 @@ const ExploreEvents = () => {
                         />
                       )}
                       <div className="card-body">
-                        <h2 className="card-title text-danger">
+                        <h2 className="card-title text-secondary">
                           {event.title}
                         </h2>
                         <p className="card-text">
@@ -201,7 +201,7 @@ const ExploreEvents = () => {
                                     className="form-control my-2"
                                   />
                                   <button
-                                    className="btn btn-danger btn-sm mx-2 my-2"
+                                    className="btn btn-outline-danger btn-sm mx-2 my-2"
                                     onClick={() =>
                                       handleTicketSelection(ticketType, event)
                                     }
@@ -221,7 +221,8 @@ const ExploreEvents = () => {
               {renderPagination()}
             </div>
           ) : (
-            <p>No events</p>
+            <h1 className="text-center text-danger mt-5">No events</h1>
+
           )}
         </div>
       </div>

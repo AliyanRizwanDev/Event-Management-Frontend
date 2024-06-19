@@ -81,8 +81,6 @@ export default function Notifications() {
       setLoading(false);
     }
   };
-
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentNotifications = notifications.slice(indexOfFirstItem, indexOfLastItem);
@@ -92,9 +90,9 @@ export default function Notifications() {
   return (
     <HomeOrgSide>
       <div className="container">
-        <h1 className="text-danger">Notifications</h1>
+        <h1 className="text-secondary">Notifications</h1>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="newNotification" className="text-danger">
+          <label htmlFor="newNotification">
             New Notification:
           </label>
           <input
@@ -105,20 +103,21 @@ export default function Notifications() {
             className="form-control mb-2"
             required
           />
-          <button type="submit" className="btn btn-danger mb-2">
+          <button type="submit" className="btn btn-outline-danger mb-2">
             Create Notification
           </button>
         </form>
         {loading ? (
           <Spinner />
         ) : notifications.length === 0 ? (
-          <p className="text-danger">No notifications found</p>
+          <h1 className="text-center text-danger mt-5">No notifications found</h1>
+
         ) : (
           <>
             <ul className="list-group">
               {currentNotifications.map((notification) => (
                 <li key={notification._id} className="list-group-item border my-1">
-                  <p className="text-danger">{notification.message}</p>
+                  <p className="text-dark">{notification.message}</p>
                   <button onClick={() => cancelNotification(notification._id)} className="btn btn-danger">
                     Cancel
                   </button>

@@ -108,20 +108,21 @@ const AllEventsDetails = () => {
   return (
     <HomeOrgSide>
       <div className="container mt-4">
-        <h1 className="text-center text-danger">Event Analytics</h1>
+        <h1 className="text-center text-secondary">Event Analytics</h1>
         {loading ? (
           <Spinner />
         ) : error ? (
-          <p className="text-danger">{error}</p>
+          <h1 className="text-center text-danger mt-5">{error}</h1>
+
         ) : (
           currentEvents.map((event) => (
-            <div key={event._id} className="card mb-4 border-danger">
-              <div className="card-header bg-danger text-white">
+            <div key={event._id} className="card mb-4 border-light shadow-sm">
+              <div className="card-header bg-light text-dark">
                 <h2>{event.title}</h2>
               </div>
               <div className="card-body">
                 <section className="mb-3">
-                  <h3 className="text-danger">Ticket Sales</h3>
+                  <h3 className="text-secondary">Ticket Sales</h3>
                   {event.ticketTypes.map((ticket) => (
                     <div key={ticket._id} className="mb-2">
                       <p>
@@ -141,7 +142,7 @@ const AllEventsDetails = () => {
                 </section>
 
                 <section className="mb-3">
-                  <h3 className="text-danger">Attendees</h3>
+                  <h3 className="text-secondary">Attendees</h3>
                   <ul className="list-group">
                     {attendeesMap[event._id] && attendeesMap[event._id].length > 0 ? (
                       attendeesMap[event._id].map((attendee) => (

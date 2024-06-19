@@ -12,7 +12,7 @@ import MyProfile from "./pages/Attendee/MyProfile";
 import MyProfileOrg from "./pages/Organizer/MyProfileOrg";
 import AttendeeDashboard from "./pages/Attendee/AttendeeDashboard";
 import CreateEvent from "./pages/Organizer/CreateEvent";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from "./redux/store";
 import MyEventsOrg from "./pages/Organizer/MyEventsOrg";
@@ -27,7 +27,7 @@ function App() {
   const isAuthenticated = useSelector((state) => state.isAuthenticated);
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-
+  const location = useLocation();
   useEffect(() => {
     const storedAuthState = JSON.parse(localStorage.getItem("user"));
     if (storedAuthState) {
@@ -74,10 +74,9 @@ function App() {
     );
   }
 
-  console.log(isAuthenticated);
   return (
     <div className="App">
-      <NavBar />
+      {!(location.pathname === "/" || location.pathname === "/sign-up") && <NavBar/> }
       <ScrollToTop />
       <Routes>
         {isAuthenticated ? (

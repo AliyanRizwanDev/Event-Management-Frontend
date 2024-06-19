@@ -145,7 +145,6 @@ export default function EditEventModal({ eventId }) {
           },
         }
       );
-      console.log("Event updated successfully:", response.data);
       toast.success("Event updated successfully");
     } catch (error) {
       console.error("Error updating event:", error);
@@ -161,14 +160,11 @@ export default function EditEventModal({ eventId }) {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center" style={{ color: "red" }}>
-        Edit Event
-      </h1>
-      {loading && <Spinner />}
-      {error && <p className="text-danger">{error}</p>}
+      <h1 className="text-center text-secondary mb-4">Edit Event</h1>
+      {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="title">Event Title</label>
+        <div className="form-group mb-3">
+          <label htmlFor="title">Event Title:</label>
           <input
             type="text"
             id="title"
@@ -178,8 +174,8 @@ export default function EditEventModal({ eventId }) {
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="description">Event Description</label>
+        <div className="form-group mb-3">
+          <label htmlFor="description">Event Description:</label>
           <textarea
             id="description"
             className="form-control"
@@ -188,8 +184,8 @@ export default function EditEventModal({ eventId }) {
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="date">Event Date</label>
+        <div className="form-group mb-3">
+          <label htmlFor="date">Event Date:</label>
           <input
             type="date"
             id="date"
@@ -200,8 +196,8 @@ export default function EditEventModal({ eventId }) {
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="time">Event Time</label>
+        <div className="form-group mb-3">
+          <label htmlFor="time">Event Time:</label>
           <input
             type="time"
             id="time"
@@ -211,8 +207,8 @@ export default function EditEventModal({ eventId }) {
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="venue">Event Venue</label>
+        <div className="form-group mb-3">
+          <label htmlFor="venue">Event Venue:</label>
           <input
             type="text"
             id="venue"
@@ -222,21 +218,21 @@ export default function EditEventModal({ eventId }) {
             required
           />
         </div>
-        <div className="input-group my-3">
+        <div className="input-group mb-3">
           <input type="file" className="form-control" id="inputGroupFile02" />
           <label className="input-group-text" htmlFor="inputGroupFile02">
             Upload Event Image
           </label>
         </div>
         <div className="mt-4">
-          <h2 style={{ color: "red" }}>Ticket Types</h2>
+          <h2 className="text-secondary">Ticket Types</h2>
           {ticketTypes.map((ticket, index) => (
-            <div key={index} className="form-group border p-3 mb-2">
-              <div className="form-group">
-                <label htmlFor={`type-${index}`}>Type</label>
+            <div key={index} className="border p-3 mb-3 rounded">
+              <div className="form-group mb-2">
+                <label htmlFor={`ticketType-${index}`}>Type:</label>
                 <input
                   type="text"
-                  id={`type-${index}`}
+                  id={`ticketType-${index}`}
                   className="form-control"
                   value={ticket.type}
                   onChange={(e) =>
@@ -245,11 +241,11 @@ export default function EditEventModal({ eventId }) {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`price-${index}`}>Price</label>
+              <div className="form-group mb-2">
+                <label htmlFor={`ticketPrice-${index}`}>Price:</label>
                 <input
                   type="number"
-                  id={`price-${index}`}
+                  id={`ticketPrice-${index}`}
                   className="form-control"
                   value={ticket.price}
                   onChange={(e) =>
@@ -258,11 +254,11 @@ export default function EditEventModal({ eventId }) {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`quantity-${index}`}>Quantity</label>
+              <div className="form-group mb-2">
+                <label htmlFor={`ticketQuantity-${index}`}>Quantity:</label>
                 <input
                   type="number"
-                  id={`quantity-${index}`}
+                  id={`ticketQuantity-${index}`}
                   className="form-control"
                   value={ticket.quantity}
                   onChange={(e) =>
@@ -271,35 +267,34 @@ export default function EditEventModal({ eventId }) {
                   required
                 />
               </div>
-
               {index > 0 && (
                 <button
                   type="button"
+                  className="btn btn-outline-danger my-2"
                   onClick={() => handleTicketRemove(index)}
-                  className="btn btn-danger my-3"
                 >
-                  Remove
+                  Remove Ticket Type
                 </button>
               )}
             </div>
           ))}
           <button
             type="button"
+            className="btn btn-outline-primary mb-4"
             onClick={addTicketType}
-            className="btn btn-primary my-3"
           >
             Add Ticket Type
           </button>
         </div>
         <div className="mt-4">
-          <h2 style={{ color: "red" }}>Discount Codes</h2>
+          <h2 className="text-danger">Discount Codes</h2>
           {discountCodes.map((discount, index) => (
-            <div key={index} className="form-group border p-3 mb-2">
-              <div className="form-group">
-                <label htmlFor={`code-${index}`}>Code</label>
+            <div key={index} className="border p-3 mb-3 rounded">
+              <div className="form-group mb-2">
+                <label htmlFor={`discountCode-${index}`}>Code:</label>
                 <input
                   type="text"
-                  id={`code-${index}`}
+                  id={`discountCode-${index}`}
                   className="form-control"
                   value={discount.code}
                   onChange={(e) =>
@@ -308,9 +303,9 @@ export default function EditEventModal({ eventId }) {
                   required
                 />
               </div>
-              <div className="form-group">
+              <div className="form-group mb-2">
                 <label htmlFor={`discountPercentage-${index}`}>
-                  Discount Percentage
+                  Discount Percentage:
                 </label>
                 <input
                   type="number"
@@ -329,11 +324,13 @@ export default function EditEventModal({ eventId }) {
                   max={100}
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`expiryDate-${index}`}>Discount Expiry Date</label>
+              <div className="form-group mb-2">
+                <label htmlFor={`discountExpiryDate-${index}`}>
+                  Discount Expiry Date:
+                </label>
                 <input
                   type="date"
-                  id={`expiryDate-${index}`}
+                  id={`discountExpiryDate-${index}`}
                   className="form-control"
                   value={discount.expiryDate.split("T")[0]}
                   onChange={(e) =>
@@ -346,18 +343,18 @@ export default function EditEventModal({ eventId }) {
               {index > 0 && (
                 <button
                   type="button"
+                  className="btn btn-outline-danger my-2"
                   onClick={() => handleDiscountRemove(index)}
-                  className="btn btn-danger my-3"
                 >
-                  Remove
+                  Remove Discount Code
                 </button>
               )}
             </div>
           ))}
           <button
             type="button"
+            className="btn btn-outline-primary"
             onClick={addDiscountCode}
-            className="btn btn-primary"
           >
             Add Discount Code
           </button>

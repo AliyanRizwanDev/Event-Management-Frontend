@@ -17,8 +17,8 @@ const modalStyles = {
     transform: "translate(-50%, -50%)",
     width: "60%",
     height: "600px",
-    border: "2px solid black",
-    boxShadow: "5px 5px 20px",
+    border: "2px solid #ccc",
+    boxShadow: "5px 5px 20px rgba(0,0,0,0.2)",
   },
 };
 
@@ -101,31 +101,33 @@ const MyEventsOrg = () => {
   return (
     <HomeOrgSide>
       <div className="container mt-4">
-        <h1 className="text-danger text-center">My Events</h1>
+        <h1 className="text-secondary text-center">My Events</h1>
         {loading ? (
           <Spinner />
         ) : events.length === 0 ? (
-          <p className="text-danger">No events found</p>
+          <h1 className="text-center text-danger mt-5">No Events Yet</h1>
+
+          
         ) : (
           <ul className="list-group">
             {currentEvents.map((event) => (
-              <li key={event._id} className="list-group-item border my-2">
+              <li key={event._id} className="list-group-item border-light shadow-sm my-2">
                 <div className="d-flex align-items-start">
                   <div className="flex-grow-1">
-                    <h2 className="text-danger">{event.title}</h2>
+                    <h2 className="text-secondary">{event.title}</h2>
                     <p>{event.description}</p>
                     <p>Date: {event.date.split("T")[0]}</p>
                     <p>Time: {event.time}</p>
                     <p>Venue: {event.venue}</p>
                     <button
                       onClick={() => cancelEvent(event._id)}
-                      className="btn btn-danger me-2"
+                      className="btn btn-outline-danger me-2"
                     >
                       Delete Event
                     </button>
                     <button
                       onClick={() => editEvent(event._id)}
-                      className="btn btn-danger"
+                      className="btn btn-outline-primary"
                     >
                       Edit Event
                     </button>
@@ -177,8 +179,7 @@ const MyEventsOrg = () => {
         <EditEventModal eventId={eventId} />
         <button
           onClick={closeModal}
-          style={{ zIndex: "1000" }}
-          className="btn btn-danger mt-3"
+          className="btn btn-outline-danger mt-3"
         >
           Close
         </button>

@@ -78,7 +78,7 @@ const MyEvents = () => {
   return (
     <Home>
       <div className="container mt-4">
-        <h1 className="text-center text-danger">My Events</h1>
+        <h1 className="text-center text-secondary">My Events</h1>
         {loading ? (
           <Spinner />
         ) : error ? (
@@ -127,7 +127,7 @@ const MyEvents = () => {
             ))}
           </ul>
         ) : (
-          <p className="text-center">No events booked!!!</p>
+          <h1 className="text-center text-danger mt-5">No events booked!!!</h1>
         )}
 
         {selectedEvent && (

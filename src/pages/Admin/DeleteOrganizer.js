@@ -67,7 +67,7 @@ export default function DeleteOrganizer() {
   return (
     <HomeAdminSide>
       <div className="container mt-4 ">
-        <h1 className="text-danger">Delete Organizer</h1>
+        <h1 className="text-secondary">Delete Organizer</h1>
         {loading ? (
           <Spinner />
         ) : (
@@ -75,12 +75,12 @@ export default function DeleteOrganizer() {
             <ul className="list-group ">
               {currentUsers.map((user) => (
                 <li key={user._id} className="list-group-item border my-2">
-                  <p>
+                  <h4>
                     {user.firstName} {user.lastName} ({user.email})
-                  </p>
+                  </h4>
                   <button
                     onClick={() => handleDelete(user._id)}
-                    className="btn btn-danger"
+                    className="btn btn-outline-danger"
                   >
                     Delete
                   </button>

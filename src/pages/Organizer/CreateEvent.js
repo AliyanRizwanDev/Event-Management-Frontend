@@ -125,7 +125,6 @@ export default function CreateEvent() {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("Event created successfully:", response.data);
       toast.success("Event created successfully");
     } catch (error) {
       console.error("Error creating event:", error);
@@ -146,15 +145,13 @@ export default function CreateEvent() {
 
   return (
     <HomeOrgSide>
-      <div className="container mt-5">
-        <h1 className="text-center" style={{ color: "red" }}>
-          Create New Event
-        </h1>
+      <div className="container mt-2">
+        <h1 className="text-center text-secondary mb-4">Create New Event</h1>
         {loading && <Spinner />}
-        {error && <p className="text-danger">{error}</p>}
+        {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="title">Title:</label>
+          <div className="form-group mb-3">
+            <label htmlFor="title" className="form-label">Title:</label>
             <input
               type="text"
               id="title"
@@ -164,8 +161,8 @@ export default function CreateEvent() {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="description">Description:</label>
+          <div className="form-group mb-3">
+            <label htmlFor="description" className="form-label">Description:</label>
             <textarea
               id="description"
               className="form-control"
@@ -174,8 +171,8 @@ export default function CreateEvent() {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="date">Date:</label>
+          <div className="form-group mb-3">
+            <label htmlFor="date" className="form-label">Date:</label>
             <input
               type="date"
               id="date"
@@ -186,8 +183,8 @@ export default function CreateEvent() {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="time">Time:</label>
+          <div className="form-group mb-3">
+            <label htmlFor="time" className="form-label">Time:</label>
             <input
               type="time"
               id="time"
@@ -197,8 +194,8 @@ export default function CreateEvent() {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="venue">Venue:</label>
+          <div className="form-group mb-3">
+            <label htmlFor="venue" className="form-label">Venue:</label>
             <input
               type="text"
               id="venue"
@@ -208,8 +205,8 @@ export default function CreateEvent() {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="image">Event Image:</label>
+          <div className="form-group mb-3">
+            <label htmlFor="image" className="form-label">Event Image:</label>
             <input
               type="file"
               id="image"
@@ -217,13 +214,11 @@ export default function CreateEvent() {
               onChange={handleImageChange}
             />
           </div>
-          <h2 className="text-center my-4" style={{ color: "red" }}>
-            Ticket Types
-          </h2>
+          <h2 className="text-center text-secondary my-4">Ticket Types</h2>
           {ticketTypes.map((ticket, index) => (
-            <div key={index} className="ticket-type">
-              <div className="form-group">
-                <label htmlFor={`ticketType-${index}`}>Type:</label>
+            <div key={index} className="border p-3 mb-3 rounded">
+              <div className="form-group mb-2">
+                <label htmlFor={`ticketType-${index}`} className="form-label">Type:</label>
                 <input
                   type="text"
                   id={`ticketType-${index}`}
@@ -235,8 +230,8 @@ export default function CreateEvent() {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`ticketPrice-${index}`}>Price:</label>
+              <div className="form-group mb-2">
+                <label htmlFor={`ticketPrice-${index}`} className="form-label">Price:</label>
                 <input
                   type="number"
                   id={`ticketPrice-${index}`}
@@ -248,8 +243,8 @@ export default function CreateEvent() {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`ticketQuantity-${index}`}>Quantity:</label>
+              <div className="form-group mb-2">
+                <label htmlFor={`ticketQuantity-${index}`} className="form-label">Quantity:</label>
                 <input
                   type="number"
                   id={`ticketQuantity-${index}`}
@@ -261,11 +256,10 @@ export default function CreateEvent() {
                   required
                 />
               </div>
-              
               {ticketTypes.length > 1 && (
                 <button
                   type="button"
-                  className="btn btn-danger my-2"
+                  className="btn btn-outline-danger my-2"
                   onClick={() => handleTicketRemove(index)}
                 >
                   Remove Ticket Type
@@ -275,18 +269,16 @@ export default function CreateEvent() {
           ))}
           <button
             type="button"
-            className="btn btn-primary my-2"
+            className="btn btn-outline-primary mb-4"
             onClick={addTicketType}
           >
             Add Ticket Type
           </button>
-          <h2 className="text-center" style={{ color: "red" }}>
-            Discount Codes
-          </h2>
+          <h2 className="text-center text-secondary my-4">Discount Codes</h2>
           {discountCodes.map((discount, index) => (
-            <div key={index} className="discount-code">
-              <div className="form-group">
-                <label htmlFor={`discountCode-${index}`}>Code:</label>
+            <div key={index} className="border p-3 mb-3 rounded">
+              <div className="form-group mb-2">
+                <label htmlFor={`discountCode-${index}`} className="form-label">Code:</label>
                 <input
                   type="text"
                   id={`discountCode-${index}`}
@@ -298,8 +290,8 @@ export default function CreateEvent() {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`discountPercentage-${index}`}>
+              <div className="form-group mb-2">
+                <label htmlFor={`discountPercentage-${index}`} className="form-label">
                   Discount Percentage:
                 </label>
                 <input
@@ -319,12 +311,12 @@ export default function CreateEvent() {
                   max="100"
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor={`expiryDate-${index}`}>Expiry Date:</label>
+              <div className="form-group mb-2">
+                <label htmlFor={`expiryDate-${index}`} className="form-label">Expiry Date:</label>
                 <input
                   type="date"
                   id={`expiryDate-${index}`}
-                  className="form-control my-2"
+                  className="form-control"
                   value={discount.expiryDate}
                   onChange={(e) =>
                     handleDiscountChange(index, "expiryDate", e.target.value)
@@ -334,23 +326,24 @@ export default function CreateEvent() {
                 />
               </div>
               {discountCodes.length > 1 && (
-              <button
-                type="button"
-                className="btn btn-danger my-2 "
-                onClick={() => handleDiscountRemove(index)}
-              >
-                Remove Discount Code
-              </button>)}
+                <button
+                  type="button"
+                  className="btn btn-outline-danger my-2"
+                  onClick={() => handleDiscountRemove(index)}
+                >
+                  Remove Discount Code
+                </button>
+              )}
             </div>
           ))}
           <button
             type="button"
-            className="btn btn-primary my-2"
+            className="btn btn-outline-primary mb-4"
             onClick={addDiscountCode}
           >
             Add Discount Code
           </button>
-          <button type="submit" className="btn btn-success mx-3 my-2">
+          <button type="submit" className="btn btn-success mx-4 mb-4">
             Create Event
           </button>
         </form>
