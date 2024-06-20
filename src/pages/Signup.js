@@ -23,16 +23,16 @@ export default function Signup() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email.toLowerCase());
     const isPasswordValid = password.length >= 6;
     const isConfirmPasswordValid = password === confirmPassword;
-  
+
     setEmailError(!isEmailValid);
     setPasswordError(!isPasswordValid);
     setConfirmPasswordError(!isConfirmPasswordValid);
-  
+
     if (isEmailValid && isPasswordValid && isConfirmPasswordValid) {
       setLoading(true);
       const data = {
@@ -42,7 +42,7 @@ export default function Signup() {
         password,
         role,
       };
-  
+
       try {
         await axios.post(`${API_ROUTE}/user/signup`, data);
         setApiError("");
@@ -56,7 +56,6 @@ export default function Signup() {
       }
     }
   };
-  
 
   return (
     <div className={classes.loginPage}>
@@ -124,8 +123,8 @@ export default function Signup() {
             <option value="admin">Admin</option>
           </select>
           {apiError && <p className={classes.errorMessage}>{apiError}</p>}
-          <button type="submit" disabled={loading}>
-            {loading ? <Spinner /> : "Sign Up"}
+          <button style={{ padding: "0px" }} type="submit" disabled={loading}>
+            {!loading ? <Spinner /> : "Sign Up"}
           </button>
           <p>
             Already have an account?
