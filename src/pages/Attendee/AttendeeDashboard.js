@@ -8,36 +8,37 @@ import Spinner from "../../utils/Spinner";
 const AttendeeDashboard = () => {
   const data = JSON.parse(localStorage.getItem("user"));
 
-  const [notification, setNotification] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [users, setUsers] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
 
   useEffect(() => {
-    const fetchUsersEventsAndNotifications = async () => {
+    const fetchUsersAndEvents = async () => {
       try {
-        const [eventsResponse, usersResponse, notificationsResponse] = await Promise.all([
-          axios.get(`${API_ROUTE}/user/events`, {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }),
-          axios.get(`${API_ROUTE}/user/profile/`, {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }),
-          axios.get(`${API_ROUTE}/user/notifications`, {
-            headers: {
-              Authorization: `Bearer ${data.token}`,
-            },
-          }),
-        ]);
+        const [eventsResponse, usersResponse, notificationsResponse] =
+          await Promise.all([
+            axios.get(`${API_ROUTE}/user/events`, {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            }),
+            axios.get(`${API_ROUTE}/user/profile/`, {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            }),
+            axios.get(`${API_ROUTE}/user/notifications`, {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            }),
+          ]);
 
         setUpcomingEvents(eventsResponse.data);
         setUsers(usersResponse.data);
-        setNotification(notificationsResponse.data);
+        setNotifications(notificationsResponse.data);
       } catch (error) {
         console.error(error);
         toast.error("Failed to load data");
@@ -47,15 +48,15 @@ const AttendeeDashboard = () => {
       }
     };
 
-    fetchUsersEventsAndNotifications();
+    fetchUsersAndEvents();
   }, [data.token]);
 
   const filteredEvents = upcomingEvents.filter((event) => {
-    return users.some(user => user._id === event.organizer);
+    return users.some((user) => user._id === event.organizer);
   });
 
-  const filteredNotifications = notification.filter((notif) => {
-    return users.some(user => user._id === notif.organizer);
+  const filteredNotifications = notifications.filter((notif) => {
+    return users.some((user) => user._id === notif.userId);
   });
 
   return (
@@ -76,7 +77,8 @@ const AttendeeDashboard = () => {
                   <ul className="list-group list-group-flush">
                     {filteredEvents.slice(0, 5).map((event) => (
                       <li key={event._id} className="list-group-item">
-                        {event.title} - {new Date(event.date).toLocaleDateString()}
+                        {event.title} -{" "}
+                        {new Date(event.date).toLocaleDateString()}
                       </li>
                     ))}
                   </ul>
