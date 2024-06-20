@@ -72,31 +72,37 @@ export default function DeleteOrganizer() {
           <Spinner />
         ) : (
           <div>
-            <ul className="list-group ">
-              {currentUsers.map((user) => (
-                <li key={user._id} className="list-group-item border my-2">
-                  <h4>
-                    {user.firstName} {user.lastName} ({user.email})
-                  </h4>
-                  <button
-                    onClick={() => handleDelete(user._id)}
-                    className="btn btn-outline-danger"
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
-            {users.length > itemsPerPage && (
-              <ul className="pagination justify-content-center mt-3">
-                {Array.from({ length: Math.ceil(users.length / itemsPerPage) }, (_, i) => (
-                  <li key={i + 1} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                    <button onClick={() => paginate(i + 1)} className="page-link text-danger">
-                      {i + 1}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            {users.length === 0 ? (
+              <p className="text-center">No organizers found</p>
+            ) : (
+              <div>
+                <ul className="list-group ">
+                  {currentUsers.map((user) => (
+                    <li key={user._id} className="list-group-item border my-2">
+                      <h4>
+                        {user.firstName} {user.lastName} ({user.email})
+                      </h4>
+                      <button
+                        onClick={() => handleDelete(user._id)}
+                        className="btn btn-outline-danger"
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {users.length > itemsPerPage && (
+                  <ul className="pagination justify-content-center mt-3">
+                    {Array.from({ length: Math.ceil(users.length / itemsPerPage) }, (_, i) => (
+                      <li key={i + 1} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                        <button onClick={() => paginate(i + 1)} className="page-link text-danger">
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
           </div>
         )}

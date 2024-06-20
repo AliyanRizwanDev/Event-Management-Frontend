@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import Home from "../../utils/Home";
 import { API_ROUTE } from "../../env";
@@ -16,26 +15,25 @@ const AttendeeDashboard = () => {
   const [loadingNotifications, setLoadingNotifications] = useState(true);
 
   useEffect(() => {
-    const fetchUsersAndEvents = async () => {
+    const fetchUsersEventsAndNotifications = async () => {
       try {
-        const [eventsResponse, usersResponse, notificationsResponse] =
-          await Promise.all([
-            axios.get(`${API_ROUTE}/user/events`, {
-              headers: {
-                Authorization: `Bearer ${data.token}`,
-              },
-            }),
-            axios.get(`${API_ROUTE}/user/profile/`, {
-              headers: {
-                Authorization: `Bearer ${data.token}`,
-              },
-            }),
-            axios.get(`${API_ROUTE}/user/notifications`, {
-              headers: {
-                Authorization: `Bearer ${data.token}`,
-              },
-            }),
-          ]);
+        const [eventsResponse, usersResponse, notificationsResponse] = await Promise.all([
+          axios.get(`${API_ROUTE}/user/events`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }),
+          axios.get(`${API_ROUTE}/user/profile/`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }),
+          axios.get(`${API_ROUTE}/user/notifications`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }),
+        ]);
 
         setUpcomingEvents(eventsResponse.data);
         setUsers(usersResponse.data);
@@ -49,11 +47,15 @@ const AttendeeDashboard = () => {
       }
     };
 
-    fetchUsersAndEvents();
+    fetchUsersEventsAndNotifications();
   }, [data.token]);
 
   const filteredEvents = upcomingEvents.filter((event) => {
-    return users.some((user) => user._id === event.organizer);
+    return users.some(user => user._id === event.organizer);
+  });
+
+  const filteredNotifications = notification.filter((notif) => {
+    return users.some(user => user._id === notif.organizer);
   });
 
   return (
@@ -74,8 +76,7 @@ const AttendeeDashboard = () => {
                   <ul className="list-group list-group-flush">
                     {filteredEvents.slice(0, 5).map((event) => (
                       <li key={event._id} className="list-group-item">
-                        {event.title} -{" "}
-                        {new Date(event.date).toLocaleDateString()}
+                        {event.title} - {new Date(event.date).toLocaleDateString()}
                       </li>
                     ))}
                   </ul>
@@ -94,11 +95,11 @@ const AttendeeDashboard = () => {
               <div className="card-body">
                 {loadingNotifications ? (
                   <Spinner />
-                ) : notification.length > 0 ? (
+                ) : filteredNotifications.length > 0 ? (
                   <ul className="list-group list-group-flush">
-                    {notification.slice(0, 5).map((notification) => (
-                      <li key={notification._id} className="list-group-item">
-                        {notification.message}
+                    {filteredNotifications.slice(0, 5).map((notif) => (
+                      <li key={notif._id} className="list-group-item">
+                        {notif.message}
                       </li>
                     ))}
                   </ul>
