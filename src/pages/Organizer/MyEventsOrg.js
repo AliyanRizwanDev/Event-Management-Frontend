@@ -15,8 +15,9 @@ const modalStyles = {
     bottom: "auto",
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
-    width: "60%",
-    height: "600px",
+    maxWidth: "80%", // Adjusted width for responsiveness
+    maxHeight: "80%", // Adjusted height for responsiveness
+    overflow: "auto", // Enable scrolling when modal content exceeds dimensions
     border: "2px solid #ccc",
     boxShadow: "5px 5px 20px rgba(0,0,0,0.2)",
   },
@@ -106,39 +107,41 @@ const MyEventsOrg = () => {
           <Spinner />
         ) : events.length === 0 ? (
           <h1 className="text-center text-danger mt-5">No Events Yet</h1>
-
-          
         ) : (
           <ul className="list-group">
             {currentEvents.map((event) => (
               <li key={event._id} className="list-group-item border-light shadow-sm my-2">
-                <div className="d-flex align-items-start">
-                  <div className="flex-grow-1">
+                <div className="row align-items-start">
+                  <div className="col-md-8">
                     <h2 className="text-secondary">{event.title}</h2>
                     <p>{event.description}</p>
                     <p>Date: {event.date.split("T")[0]}</p>
                     <p>Time: {event.time}</p>
                     <p>Venue: {event.venue}</p>
-                    <button
-                      onClick={() => cancelEvent(event._id)}
-                      className="btn btn-outline-danger me-2"
-                    >
-                      Delete Event
-                    </button>
-                    <button
-                      onClick={() => editEvent(event._id)}
-                      className="btn btn-outline-primary"
-                    >
-                      Edit Event
-                    </button>
+                    <div className="d-flex">
+                      <button
+                        onClick={() => cancelEvent(event._id)}
+                        className="btn btn-outline-danger me-2"
+                      >
+                        Delete Event
+                      </button>
+                      <button
+                        onClick={() => editEvent(event._id)}
+                        className="btn btn-outline-primary"
+                      >
+                        Edit Event
+                      </button>
+                    </div>
                   </div>
                   {event.image && (
-                    <img
-                      src={`${API_ROUTE}/api/uploads/${event.image}`}
-                      alt="Event"
-                      className="img-fluid mb-3 ms-3"
-                      style={{ maxHeight: "200px", objectFit: "cover" }}
-                    />
+                    <div className="col-md-4">
+                      <img
+                        src={`${API_ROUTE}/api/uploads/${event.image}`}
+                        alt="Event"
+                        className="img-fluid mb-3 my-4"
+                        style={{ height: "200px", objectFit: "cover" ,width: "400px"}}
+                      />
+                    </div>
                   )}
                 </div>
               </li>

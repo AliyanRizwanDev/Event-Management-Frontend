@@ -8,13 +8,15 @@ import Spinner from "../../utils/Spinner";
 const ExploreEvents = () => {
   const [events, setEvents] = useState([]);
   const [users, setUsers] = useState([]);
-  const data = JSON.parse(localStorage.getItem("user"));
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const [discountCodes, setDiscountCodes] = useState({});
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
+  const [bookedEvents, setBookedEvents] = useState(new Set());
+
+  const data = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchUsersAndEvents = async () => {
@@ -34,16 +36,25 @@ const ExploreEvents = () => {
 
         setEvents(eventsResponse.data);
         setUsers(usersResponse.data);
+
+        const bookedEventIds = new Set(
+          eventsResponse.data
+            .filter((event) =>
+              event.attendees.some((attendee) => attendee === data._id)
+            )
+            .map((event) => event._id)
+        );
       } catch (error) {
         console.error(error);
         toast.error("Failed to load data");
       } finally {
         setLoading(false);
+
       }
     };
 
     fetchUsersAndEvents();
-  }, [data.token]);
+  }, [data.token, data._id]);
 
   const handleSearch = (e) => {
     setSearch(e.target.value.toLowerCase());
@@ -81,6 +92,8 @@ const ExploreEvents = () => {
       toast.success(
         `Ticket booked successfully. Final price: $${response.data.finalPrice}`
       );
+
+      setBookedEvents(new Set(bookedEvents).add(event._id));
     } catch (error) {
       if (
         error.response &&
@@ -137,7 +150,6 @@ const ExploreEvents = () => {
       </nav>
     );
   };
-
   return (
     <Home>
       <div className="container mt-4">
@@ -175,6 +187,7 @@ const ExploreEvents = () => {
                           className="card-img-top"
                           alt="Event"
                           name="image"
+                          style={{height: "200px"}}
                         />
                       )}
                       <div className="card-body">
@@ -212,14 +225,23 @@ const ExploreEvents = () => {
                                     }
                                     className="form-control my-2"
                                   />
-                                  <button
-                                    className="btn btn-outline-danger btn-sm mx-2 my-2"
-                                    onClick={() =>
-                                      handleTicketSelection(ticketType, event)
-                                    }
-                                  >
-                                    Book Me
-                                  </button>
+                                  {bookedEvents.has(event._id) ? (
+                                    <span className="text-success">
+                                      <b>Ticket Already Booked, Enjoy the event!</b>
+                                    </span>
+                                  ) : (
+                                    <button
+                                      className="btn btn-outline-danger btn-sm mx-2 my-2"
+                                      onClick={() =>
+                                        handleTicketSelection(
+                                          ticketType,
+                                          event
+                                        )
+                                      }
+                                    >
+                                      Book Me
+                                    </button>
+                                  )}
                                 </li>
                               ))}
                             </ul>

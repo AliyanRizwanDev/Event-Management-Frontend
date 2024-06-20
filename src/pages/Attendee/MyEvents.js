@@ -59,6 +59,15 @@ const MyEvents = () => {
 
       toast.success("Feedback submitted successfully");
       setSelectedEvent(null);
+
+      // Update the feedback status for the event
+      setRegisteredEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event._id === selectedEvent
+            ? { ...event, feedback: [...event.feedback, { attendee: userId }] }
+            : event
+        )
+      );
     } catch (error) {
       toast.error("Error submitting feedback");
       console.error(error);
@@ -75,6 +84,10 @@ const MyEvents = () => {
     return eventDateTime < new Date();
   };
 
+  const hasUserSubmittedFeedback = (event) => {
+    return event.feedback.some((fb) => fb.attendee === userId);
+  };
+
   return (
     <Home>
       <div className="container mt-4">
@@ -86,10 +99,7 @@ const MyEvents = () => {
         ) : registeredEvents.length > 0 ? (
           <ul className="list-group">
             {registeredEvents.map((event) => (
-              <li
-                key={event._id}
-                className={`list-group-item mb-2 border`}
-              >
+              <li key={event._id} className="list-group-item mb-2 border">
                 <div>
                   <h2 className="text-danger">{event.title}</h2>
                   <p>
@@ -99,9 +109,7 @@ const MyEvents = () => {
                     )}{" "}
                     at {event.time}
                   </p>
-                  <p>
-                    Venue: {event.venue}
-                  </p>
+                  <p>Venue: {event.venue}</p>
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => {
@@ -118,8 +126,11 @@ const MyEvents = () => {
                         setSelectedEvent(event._id);
                         setViewingTicket(false);
                       }}
+                      disabled={hasUserSubmittedFeedback(event)}
                     >
-                      Give Feedback
+                      {hasUserSubmittedFeedback(event)
+                        ? "Feedback Submitted"
+                        : "Give Feedback"}
                     </button>
                   )}
                 </div>
