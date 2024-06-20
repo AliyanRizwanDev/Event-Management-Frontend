@@ -11,42 +11,50 @@ const AttendeeDashboard = () => {
 
   const [notification, setNotification] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`${API_ROUTE}/user/events`, {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      })
-      .then((response) => {
-        setUpcomingEvents(response.data);
-        setLoadingEvents(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Failed to load events");
-        setLoadingEvents(false);
-      });
+    const fetchUsersAndEvents = async () => {
+      try {
+        const [eventsResponse, usersResponse, notificationsResponse] =
+          await Promise.all([
+            axios.get(`${API_ROUTE}/user/events`, {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            }),
+            axios.get(`${API_ROUTE}/user/profile/`, {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            }),
+            axios.get(`${API_ROUTE}/user/notifications`, {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            }),
+          ]);
 
-    axios
-      .get(`${API_ROUTE}/user/notifications`, {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      })
-      .then((response) => {
-        setNotification(response.data);
-        setLoadingNotifications(false);
-      })
-      .catch((error) => {
+        setUpcomingEvents(eventsResponse.data);
+        setUsers(usersResponse.data);
+        setNotification(notificationsResponse.data);
+      } catch (error) {
         console.error(error);
-        toast.error("Failed to load notifications");
+        toast.error("Failed to load data");
+      } finally {
+        setLoadingEvents(false);
         setLoadingNotifications(false);
-      });
+      }
+    };
+
+    fetchUsersAndEvents();
   }, [data.token]);
+
+  const filteredEvents = upcomingEvents.filter((event) => {
+    return users.some((user) => user._id === event.organizer);
+  });
 
   return (
     <Home>
@@ -62,11 +70,12 @@ const AttendeeDashboard = () => {
               <div className="card-body">
                 {loadingEvents ? (
                   <Spinner />
-                ) : upcomingEvents.length > 0 ? (
+                ) : filteredEvents.length > 0 ? (
                   <ul className="list-group list-group-flush">
-                    {upcomingEvents.slice(0, 5).map((event) => (
-                      <li key={event.id} className="list-group-item">
-                        {event.title} - {event.date.split("T")[0]}
+                    {filteredEvents.slice(0, 5).map((event) => (
+                      <li key={event._id} className="list-group-item">
+                        {event.title} -{" "}
+                        {new Date(event.date).toLocaleDateString()}
                       </li>
                     ))}
                   </ul>

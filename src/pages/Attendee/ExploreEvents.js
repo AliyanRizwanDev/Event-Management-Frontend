@@ -7,6 +7,7 @@ import Spinner from "../../utils/Spinner";
 
 const ExploreEvents = () => {
   const [events, setEvents] = useState([]);
+  const [users, setUsers] = useState([]);
   const data = JSON.parse(localStorage.getItem("user"));
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
@@ -16,21 +17,32 @@ const ExploreEvents = () => {
   const [itemsPerPage] = useState(6);
 
   useEffect(() => {
-    axios
-      .get(`${API_ROUTE}/user/events`, {
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      })
-      .then((response) => {
-        setEvents(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
+    const fetchUsersAndEvents = async () => {
+      try {
+        const [eventsResponse, usersResponse] = await Promise.all([
+          axios.get(`${API_ROUTE}/user/events`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }),
+          axios.get(`${API_ROUTE}/user/profile/`, {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          }),
+        ]);
+
+        setEvents(eventsResponse.data);
+        setUsers(usersResponse.data);
+      } catch (error) {
         console.error(error);
-        toast.error("Failed to load events");
+        toast.error("Failed to load data");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchUsersAndEvents();
   }, [data.token]);
 
   const handleSearch = (e) => {
@@ -89,7 +101,10 @@ const ExploreEvents = () => {
     const eventDateTime = new Date(event.date);
     const currentDate = new Date();
 
+    const organizerExists = users.some((user) => user._id === event.organizer);
+
     return (
+      organizerExists &&
       eventTitle.includes(search) &&
       (!location || eventVenue.includes(location)) &&
       eventDateTime >= currentDate
@@ -98,10 +113,7 @@ const ExploreEvents = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentEvents = filteredEvents.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const renderPagination = () => {
@@ -222,7 +234,6 @@ const ExploreEvents = () => {
             </div>
           ) : (
             <h1 className="text-center text-danger mt-5">No events</h1>
-
           )}
         </div>
       </div>
