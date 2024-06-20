@@ -124,7 +124,7 @@ export default function Signup() {
           </select>
           {apiError && <p className={classes.errorMessage}>{apiError}</p>}
           <button style={{ padding: "0px" }} type="submit" disabled={loading}>
-            {!loading ? <Spinner /> : "Sign Up"}
+            {loading ? <Spinner /> : "Sign Up"}
           </button>
           <p>
             Already have an account?
