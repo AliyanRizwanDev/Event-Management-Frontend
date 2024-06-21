@@ -120,7 +120,6 @@ export default function Signup() {
           >
             <option value="attendee">Attendee</option>
             <option value="organizer">Organizer</option>
-            <option value="admin">Admin</option>
           </select>
           {apiError && <p className={classes.errorMessage}>{apiError}</p>}
           <button style={{ padding: "0px" }} type="submit" disabled={loading}>
