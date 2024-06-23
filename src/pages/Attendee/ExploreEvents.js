@@ -44,12 +44,12 @@ const ExploreEvents = () => {
             )
             .map((event) => event._id)
         );
+        setBookedEvents(bookedEventIds);
       } catch (error) {
         console.error(error);
         toast.error("Failed to load data");
       } finally {
         setLoading(false);
-
       }
     };
 
@@ -64,12 +64,20 @@ const ExploreEvents = () => {
     setLocation(e.target.value.toLowerCase());
   };
 
-  const handleDiscountCodeChange = (e, eventId) => {
-    setDiscountCodes({ ...discountCodes, [eventId]: e.target.value });
+  const handleDiscountCodeChange = (e, eventId, ticketType) => {
+    setDiscountCodes({
+      ...discountCodes,
+      [eventId]: {
+        ...discountCodes[eventId],
+        [ticketType]: e.target.value,
+      },
+    });
   };
 
   const handleTicketSelection = async (ticketType, event) => {
-    const discountCode = discountCodes[event._id] || "";
+    const discountCode =
+      (discountCodes[event._id] && discountCodes[event._id][ticketType.type]) ||
+      "";
 
     const ticketData = {
       eventId: event._id,
@@ -150,6 +158,7 @@ const ExploreEvents = () => {
       </nav>
     );
   };
+
   return (
     <Home>
       <div className="container mt-4">
@@ -187,7 +196,7 @@ const ExploreEvents = () => {
                           className="card-img-top"
                           alt="Event"
                           name="image"
-                          style={{height: "200px"}}
+                          style={{ height: "200px" }}
                         />
                       )}
                       <div className="card-body">
@@ -219,15 +228,27 @@ const ExploreEvents = () => {
                                   <input
                                     type="text"
                                     placeholder="Enter discount code"
-                                    value={discountCodes[event._id] || ""}
+                                    value={
+                                      (discountCodes[event._id] &&
+                                        discountCodes[event._id][
+                                          ticketType.type
+                                        ]) ||
+                                      ""
+                                    }
                                     onChange={(e) =>
-                                      handleDiscountCodeChange(e, event._id)
+                                      handleDiscountCodeChange(
+                                        e,
+                                        event._id,
+                                        ticketType.type
+                                      )
                                     }
                                     className="form-control my-2"
                                   />
                                   {bookedEvents.has(event._id) ? (
                                     <span className="text-success">
-                                      <b>Ticket Already Booked, Enjoy the event!</b>
+                                      <b>
+                                        Ticket Already Booked, Enjoy the event!
+                                      </b>
                                     </span>
                                   ) : (
                                     <button

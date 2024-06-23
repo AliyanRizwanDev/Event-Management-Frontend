@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Spinner from "../../utils/Spinner";
 import MyTicket from "../../utils/MyTicket";
 import classes from "./MyEvents.module.css";
+import { useNavigate } from "react-router-dom";
 
 Modal.setAppElement("#root");
 
@@ -19,7 +20,6 @@ const MyEvents = () => {
   const [viewingTicket, setViewingTicket] = useState(false);
   const userData = JSON.parse(localStorage.getItem("user"));
   const userId = userData._id;
-
   useEffect(() => {
     axios
       .get(`${API_ROUTE}/user/events/`, {
@@ -60,7 +60,6 @@ const MyEvents = () => {
       toast.success("Feedback submitted successfully");
       setSelectedEvent(null);
 
-      // Update the feedback status for the event
       setRegisteredEvents((prevEvents) =>
         prevEvents.map((event) =>
           event._id === selectedEvent
